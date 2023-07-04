@@ -1,8 +1,9 @@
 import pandas as pd
 import chardet
 import sys
+import traceback
 
-raw_files_folder = "Source"    
+raw_files_folder = "..\Source"    
 
 
 
@@ -16,8 +17,20 @@ def read_files(source, notebook):
         return pd.read_csv(source, encoding=file_encoding["encoding"])
     
     except FileNotFoundError as e:
-        print(f"An error occured running the <{notebook}>. {e}>")
+        print("Incorrect file path, or file does not exist")
+            
+        with open("log.txt", "a") as f:
+            print(f"{e} error occured running the <{notebook}>", file=f)
+        sys.exit()
+    
+    except Exception:
+        trace = traceback.format_exc(limit=1)
 
+        with open("log.txt", "a") as f:
+            print(f"An unexpected error occured running the <{notebook}>", file=f)
+            print()
+            print(trace, file=f)  
+        sys.exit()
 
 
 
@@ -41,15 +54,21 @@ def source_columns_name_check(source_colums_list, expected_columns_list, noteboo
 
     try: 
         if False in result:
-            raise ValueError
-    except Exception as e:
-        print(f"An error occured running the <{notebook}>. {e}>")
+            raise ValueError("Column names do not match")
+    except Exception:
+        trace = traceback.format_exc(limit=1)
 
+        with open("log.txt", "a") as f:
+            print(f"An error occured running the <{notebook}>", file=f)
+            print()
+            print(trace, file=f)  
 
+        sys.exit()
 
 
 
 """REMOVE LEADING, TRAILING WHITESPACES"""
+
 
 def strip_df(dataframe):
     return dataframe.applymap(lambda x: x.strip() if isinstance(x, str) else x)
@@ -67,10 +86,24 @@ def mandatory_columns_null_handling(dataframe, mandatory_columns_list, notebook)
 
         return dataframe.drop(missing_madanatory_ind, axis=0)
     
-    except (AttributeError, ValueError) as e:
-        print(f"An error occured running the <{notebook}>. {e}>")
-        
+    except KeyError as e:
+        print("Column name is incorrect")
+            
+        with open("log.txt", "a") as f:
+            print(f"{e} error occured running the <{notebook}>", file=f)
+        sys.exit()   
+    
+    
+    except Exception:
+        trace = traceback.format_exc(limit=1)
 
+        with open("log.txt", "a") as f:
+            print(f"An unexpected error occured running the <{notebook}>", file=f)
+            print()
+            print(trace, file=f)  
+
+        sys.exit()
+   
 
 
 """HANDLE MISSING DATA IN OPTIONAL COLUMNS"""
@@ -88,9 +121,24 @@ def optional_columns_null_handling(dataframe, mandatory_columns_list, notebook):
         # replace special characters that indicate null values
         return dataframe_null.applymap(lambda x:  "N/A" if x in null_indicators_list else x)
 
-    except (AttributeError, ValueError) as e:
-        print(f"An error occured running the <{notebook}>. {e}>")
 
+    except KeyError as e:
+        print("Column name is incorrect")
+            
+        with open("log.txt", "a") as f:
+            print(f"{e} error occured running the <{notebook}>", file=f)
+        sys.exit()   
+
+
+    except Exception:
+        trace = traceback.format_exc(limit=1)
+
+        with open("log.txt", "a") as f:
+            print(f"An error occured running the <{notebook}>", file=f)
+            print()
+            print(trace, file=f)  
+
+        sys.exit()
 
 
 
@@ -101,11 +149,27 @@ def format_columns(dataframe, columns, replace_char_dict, notebook):
     try:
         dataframe.update(dataframe[columns].apply(lambda x: x.replace(replace_char_dict, regex=True).str.strip().str.title()))
         return dataframe
+    
+    except KeyError as e:
+        print("Column name is incorrect")
+            
+        with open("log.txt", "a") as f:
+            print(f"{e} error occured running the <{notebook}>", file=f)
+        sys.exit()  
 
-    except (AttributeError, ValueError) as e:
-        print(f"An error occured running the <{notebook}>. {e}>")
+    except Exception:
+        e_tpye, val, tb = sys.exc_info()
+        trace = traceback.format_exc(limit=1)
 
-  
+        with open("log.txt", "a") as f:
+            print(f"An error occured running the <{notebook}>", file=f)
+            print()
+            print(trace, file=f)  
+
+        sys.exit()
+
+
+
 
         
 
