@@ -167,10 +167,3 @@ def format_columns(dataframe, columns, replace_char_dict, notebook):
 
         sys.exit()
 
-
-
-
-        
-
-
-
