@@ -69,7 +69,6 @@ def source_columns_name_check(source_colums_list, expected_columns_list, noteboo
 
 """REMOVE LEADING, TRAILING WHITESPACES"""
 
-
 def strip_df(dataframe):
     return dataframe.applymap(lambda x: x.strip() if isinstance(x, str) else x)
 
